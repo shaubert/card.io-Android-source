@@ -1,16 +1,27 @@
 buildscript {
+    ext.SDK_VERSION = 25
+    ext.BUILD_TOOLS_VERSION = '26.0.2'
+
     repositories {
+        mavenCentral()
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+        classpath 'com.android.tools.build:gradle:3.0.1'
     }
 }
 
-task assemble {}
+allprojects {
+    version = VERSION_NAME
+    group = GROUP
 
-ext {
-    sdkVersion = 25
-    buildToolsVersion = '25.0.2'
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        options.compilerArgs << "-Xlint:unchecked"
+    }
 }

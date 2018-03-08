@@ -160,4 +160,22 @@ public class ViewUtil {
             button.setTypeface(Appearance.TYPEFACE_BUTTON);
         }
     }
+
+    public static void styleAsTransparentButton(Button button, Context context) {
+        setDimensions(button, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
+        button.setFocusable(true);
+        setPadding(button, "10dip", "0dip", "10dip", "0dip");
+
+        setBackground(
+                button,
+                Appearance.buttonBackgroundTransparent(context));
+
+        button.setGravity(Gravity.CENTER);
+        button.setMinimumHeight(ViewUtil.typedDimensionValueToPixelsInt(
+                Appearance.BUTTON_HEIGHT, context));
+        button.setTextColor(Appearance.TEXT_COLOR_BUTTON);
+        button.setTextSize(Appearance.TEXT_SIZE_BUTTON);
+        button.setTypeface(Appearance.TYPEFACE_BUTTON);
+    }
 }

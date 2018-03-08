@@ -1,14 +1,4 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-    }
-}
-
 repositories {
-    jcenter()
     maven {
         url "https://jitpack.io"
     }
@@ -17,15 +7,15 @@ repositories {
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
-        applicationId "io.card.development"
+        applicationId "shaubert.card.io.sample"
         minSdkVersion 18
-        targetSdkVersion 25
+        targetSdkVersion SDK_VERSION
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.0"
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
 
@@ -35,23 +25,10 @@ android {
             proguardFile getDefaultProguardFile('proguard-android.txt')
         }
     }
-
-    android.applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                output.outputFile = new File(outputFile.parent, "card.io-sample-app-${variant.name}.apk")
-            }
-        }
-    }
 }
 
 dependencies {
-    if (parent != null) {
-        compile project(':card.io')
-    } else {
-        compile 'io.card:android-sdk:REPLACE_VERSION'
-    }
+    compile project(':card.io')
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
 

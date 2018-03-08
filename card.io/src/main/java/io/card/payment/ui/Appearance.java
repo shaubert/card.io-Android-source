@@ -25,6 +25,7 @@ public class Appearance {
     public static final String CONTAINER_MARGIN_HORIZONTAL = "16dip";
     public static final String CONTAINER_MARGIN_VERTICAL = "20dip";
 
+    public static final String ZERO_SPACING = "0dip";
     public static final String BASE_SPACING = "4dip";
     public static final String VERTICAL_SPACING = "8dip";
 
@@ -45,11 +46,20 @@ public class Appearance {
     public static final int PAL_BLUE_COLOR = Color.parseColor("#009CDE");
     public static final int PAL_BLUE_COLOR_OPACITY_66 = Color.parseColor("#aa009CDE");
 
+    public static final int BLACK_COLOR_OPACITY_66 = Color.parseColor("#aa000000");
+    public static final int WHITE_COLOR_OPACITY_33 = Color.parseColor("#44FFFFFF");
+    public static final int WHITE_COLOR_OPACITY_66 = Color.parseColor("#88FFFFFF");
+
     // Background colors
 
     public static final Drawable ACTIONBAR_BACKGROUND = new ColorDrawable(
             Color.parseColor("#717074"));
     public static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#f5f5f5");
+
+    public static final int BUTTON_TRANSPARENT_NORMAL_COLOR = BLACK_COLOR_OPACITY_66;
+    public static final int BUTTON_TRANSPARENT_FOCUS_COLOR = WHITE_COLOR_OPACITY_33;
+    public static final int BUTTON_TRANSPARENT_PRESSED_COLOR = WHITE_COLOR_OPACITY_66;
+    public static final int BUTTON_TRANSPARENT_DISABLED_COLOR = Color.parseColor("#aac5ddeb");
 
     public static final int BUTTON_PRIMARY_NORMAL_COLOR = PAL_BLUE_COLOR;
     public static final int BUTTON_PRIMARY_FOCUS_COLOR = PAL_BLUE_COLOR_OPACITY_66;
@@ -94,6 +104,15 @@ public class Appearance {
         d.addState(BUTTON_STATE_DISABLED, new ColorDrawable(BUTTON_PRIMARY_DISABLED_COLOR));
         d.addState(BUTTON_STATE_FOCUSED, buttonBackgroundPrimaryFocused(context));
         d.addState(BUTTON_STATE_NORMAL, buttonBackgroundPrimaryNormal(context));
+        return d;
+    }
+
+    public static Drawable buttonBackgroundTransparent(Context context) {
+        StateListDrawable d = new StateListDrawable();
+        d.addState(BUTTON_STATE_PRESSED, new ColorDrawable(BUTTON_TRANSPARENT_PRESSED_COLOR));
+        d.addState(BUTTON_STATE_DISABLED, new ColorDrawable(BUTTON_TRANSPARENT_DISABLED_COLOR));
+        d.addState(BUTTON_STATE_FOCUSED, new ColorDrawable(BUTTON_TRANSPARENT_FOCUS_COLOR));
+        d.addState(BUTTON_STATE_NORMAL, new ColorDrawable(BUTTON_TRANSPARENT_NORMAL_COLOR));
         return d;
     }
 

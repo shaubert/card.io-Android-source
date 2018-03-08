@@ -12,42 +12,28 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Rect;
+import android.graphics.*;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.OrientationEventListener;
-import android.view.SurfaceView;
-import android.view.View;
+import android.view.*;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Constructor;
-import java.util.Date;
-
+import android.widget.*;
 import io.card.payment.i18n.LocalizedStrings;
 import io.card.payment.i18n.StringKey;
 import io.card.payment.ui.ActivityHelper;
 import io.card.payment.ui.Appearance;
 import io.card.payment.ui.ViewUtil;
+
+import java.io.ByteArrayInputStream;
+import java.lang.reflect.Constructor;
+import java.util.Date;
 
 /**
  * This is the entry point {@link android.app.Activity} for a card.io client to use <a
@@ -124,6 +110,11 @@ public final class CardIOActivity extends Activity {
      * Boolean extra indicating card was not scanned.
      */
     private static final String EXTRA_MANUAL_ENTRY_RESULT = "io.card.payment.manualEntryScanResult";
+
+    /**
+     * Boolean extra indicating card was not scanned.
+     */
+    public static final String EXTRA_MANUAL_ENTRY_BUTTON_TITLE = "io.card.payment.manualEntryButtonTitle";
 
     /**
      * Boolean extra. Optional. Defaults to <code>false</code>. Removes the keyboard button from the
@@ -293,6 +284,8 @@ public final class CardIOActivity extends Activity {
     private int mLastDegrees;
     private int mFrameOrientation;
     private boolean suppressManualEntry;
+    private int manualEntryButtonTitleResId;
+    private CharSequence manualEntryButtonTitleText;
     private boolean mDetectOnly;
     private LinearLayout customOverlayLayout;
     private boolean waitingForPermission;
@@ -349,7 +342,10 @@ public final class CardIOActivity extends Activity {
         }
 
         suppressManualEntry = clientData.getBooleanExtra(EXTRA_SUPPRESS_MANUAL_ENTRY, false);
-
+        if (!suppressManualEntry) {
+            manualEntryButtonTitleText = clientData.getCharSequenceExtra(EXTRA_MANUAL_ENTRY_BUTTON_TITLE);
+            manualEntryButtonTitleResId = clientData.getIntExtra(EXTRA_MANUAL_ENTRY_BUTTON_TITLE, 0);
+        }
 
         if (savedInstanceState != null) {
             waitingForPermission = savedInstanceState.getBoolean(BUNDLE_WAITING_FOR_PERMISSION);
@@ -926,7 +922,7 @@ public final class CardIOActivity extends Activity {
                 mOverlay.setGuideColor(Color.GREEN);
             }
 
-            boolean hideCardIOLogo = getIntent().getBooleanExtra(EXTRA_HIDE_CARDIO_LOGO, false);
+            boolean hideCardIOLogo = getIntent().getBooleanExtra(EXTRA_HIDE_CARDIO_LOGO, true);
             mOverlay.setHideCardIOLogo(hideCardIOLogo);
 
             String scanInstructions = getIntent().getStringExtra(EXTRA_SCAN_INSTRUCTIONS);
@@ -959,7 +955,13 @@ public final class CardIOActivity extends Activity {
         if (!suppressManualEntry) {
             Button keyboardBtn = new Button(this);
             keyboardBtn.setId(KEY_BTN_ID);
-            keyboardBtn.setText(LocalizedStrings.getString(StringKey.KEYBOARD));
+            if (manualEntryButtonTitleResId > 0) {
+                keyboardBtn.setText(manualEntryButtonTitleResId);
+            } else if (!TextUtils.isEmpty(manualEntryButtonTitleText)) {
+                keyboardBtn.setText(manualEntryButtonTitleText);
+            } else {
+                keyboardBtn.setText(LocalizedStrings.getString(StringKey.KEYBOARD));
+            }
             keyboardBtn.setOnClickListener(new Button.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -967,21 +969,18 @@ public final class CardIOActivity extends Activity {
                 }
             });
             mUIBar.addView(keyboardBtn);
-            ViewUtil.styleAsButton(keyboardBtn, false, this, useApplicationTheme);
-            if(!useApplicationTheme){
-                keyboardBtn.setTextSize(Appearance.TEXT_SIZE_SMALL_BUTTON);
-            }
+            ViewUtil.styleAsTransparentButton(keyboardBtn, this);
             keyboardBtn.setMinimumHeight(ViewUtil.typedDimensionValueToPixelsInt(
-                    Appearance.SMALL_BUTTON_HEIGHT, this));
+                    Appearance.BUTTON_HEIGHT, this));
             RelativeLayout.LayoutParams keyboardParams = (RelativeLayout.LayoutParams) keyboardBtn
                     .getLayoutParams();
-            keyboardParams.width = LayoutParams.WRAP_CONTENT;
+            keyboardParams.width = LayoutParams.MATCH_PARENT;
             keyboardParams.height = LayoutParams.WRAP_CONTENT;
             keyboardParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             ViewUtil.setPadding(keyboardBtn, Appearance.CONTAINER_MARGIN_HORIZONTAL, null,
                     Appearance.CONTAINER_MARGIN_HORIZONTAL, null);
-            ViewUtil.setMargins(keyboardBtn, Appearance.BASE_SPACING, Appearance.BASE_SPACING,
-                    Appearance.BASE_SPACING, Appearance.BASE_SPACING);
+            ViewUtil.setMargins(keyboardBtn, Appearance.ZERO_SPACING, Appearance.BASE_SPACING,
+                    Appearance.ZERO_SPACING, Appearance.BASE_SPACING);
 
         }
         // Device has a flash, show the flash button
@@ -990,7 +989,7 @@ public final class CardIOActivity extends Activity {
         uiParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         final float scale = getResources().getDisplayMetrics().density;
         int uiBarMarginPx = (int) (UIBAR_VERTICAL_MARGIN_DP * scale + 0.5f);
-        uiParams.setMargins(0, uiBarMarginPx, 0, uiBarMarginPx);
+        uiParams.setMargins(0, uiBarMarginPx, 0, 0);
         mMainLayout.addView(mUIBar, uiParams);
 
         if (getIntent() != null) {
